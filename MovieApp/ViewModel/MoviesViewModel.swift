@@ -3,14 +3,17 @@ import UIKit
 
 class MoviesViewModel {
 
+    // MARK: - Properties
+
+    var shouldShowMoviesForSearchText: Bool = false
+    var shouldShowMoviesForGenericTypeCell: Bool = false
+
     // MARK: - Private Properties
 
     private let networkService: NetworkServiceProtocol
     private var movies = [Movie]()
     private var searchedMovies = [Movie]()
     private var filteredMovies = [Movie]()
-    private var shouldShowMoviesForSearchText: Bool = false
-    private var shouldShowMoviesForGenericTypeCell: Bool = false
     private var selectedRow: Int = 0
     private var selectedSection: Int = 0
 
@@ -120,10 +123,6 @@ class MoviesViewModel {
         shouldShowMoviesForSearchText.toggle()
     }
 
-    func getShouldShowMoviesForSearchText() -> Bool {
-        return shouldShowMoviesForSearchText
-    }
-
     func fetchQueryResult(searchText: String) {
         var searchedMovies = [Movie]()
 
@@ -152,10 +151,6 @@ class MoviesViewModel {
 
     func toggleShouldShowMoviesForGenericTypeCell() {
         shouldShowMoviesForGenericTypeCell.toggle()
-    }
-
-    func getShouldShowMoviesForGenericTypeCell() -> Bool {
-        return shouldShowMoviesForGenericTypeCell
     }
 
     func fetchMoviesAfterTappingOnGenricTypeCell(searchText: String, section: Int) {

@@ -6,7 +6,7 @@ import UIKit
 extension MovieDashboardViewController: UITableViewDataSource {
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if moviesViewModel.getShouldShowMoviesForSearchText() {
+        if moviesViewModel.shouldShowMoviesForSearchText {
             switch section {
             case 4:
                 return moviesViewModel.getMovieThumbnailsForSearchedMovies().count
@@ -33,7 +33,7 @@ extension MovieDashboardViewController: UITableViewDataSource {
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        if indexPath.row == 0 && !moviesViewModel.getShouldShowMoviesForSearchText() {
+        if indexPath.row == 0 && !moviesViewModel.shouldShowMoviesForSearchText {
             return getMovieCategoryCell(for: indexPath)
         } else {
             if shouldShowMoviesForGenericTypeCell(for: indexPath) {
@@ -73,7 +73,7 @@ extension MovieDashboardViewController: UITableViewDataSource {
         if movieCategory.open {
             totalMovies += moviesViewModel.getUniqueYears().count
 
-            if moviesViewModel.getShouldShowMoviesForGenericTypeCell() {
+            if moviesViewModel.shouldShowMoviesForGenericTypeCell {
                 totalMovies += moviesViewModel.getFilteredMovies().count
             }
         }
@@ -86,7 +86,7 @@ extension MovieDashboardViewController: UITableViewDataSource {
         if movieCategory.open {
             totalMovies += moviesViewModel.getUniqueGenres().count
 
-            if moviesViewModel.getShouldShowMoviesForGenericTypeCell() {
+            if moviesViewModel.shouldShowMoviesForGenericTypeCell {
                 totalMovies += moviesViewModel.getFilteredMovies().count
             }
         }
@@ -99,7 +99,7 @@ extension MovieDashboardViewController: UITableViewDataSource {
         if movieCategory.open {
             totalMovies += moviesViewModel.getUniqueDirectors().count
 
-            if moviesViewModel.getShouldShowMoviesForGenericTypeCell() {
+            if moviesViewModel.shouldShowMoviesForGenericTypeCell {
                 totalMovies += moviesViewModel.getFilteredMovies().count
             }
         }
@@ -112,7 +112,7 @@ extension MovieDashboardViewController: UITableViewDataSource {
         if movieCategory.open {
             totalMovies += moviesViewModel.getUniqueActors().count
 
-            if moviesViewModel.getShouldShowMoviesForGenericTypeCell() {
+            if moviesViewModel.shouldShowMoviesForGenericTypeCell {
                 totalMovies += moviesViewModel.getFilteredMovies().count
             }
         }
@@ -130,7 +130,7 @@ extension MovieDashboardViewController: UITableViewDataSource {
         let filteredMovieThumbnails = moviesViewModel.getMovieThumbnailsForFilteredMovies()
         let firstRange = 0...moviesViewModel.getSelectedRow()
         return movieCategory.open
-            && moviesViewModel.getShouldShowMoviesForGenericTypeCell()
+            && moviesViewModel.shouldShowMoviesForGenericTypeCell
             && !firstRange.contains(indexPath.row)
             && indexPath.row - moviesViewModel.getSelectedRow() - 1 < filteredMovieThumbnails.count
     }
@@ -139,7 +139,7 @@ extension MovieDashboardViewController: UITableViewDataSource {
         let filteredMovies = moviesViewModel.getMovieThumbnailsForFilteredMovies()
         let firstRange = 0...moviesViewModel.getSelectedRow()
         let currentDataRow: Int
-        if moviesViewModel.getShouldShowMoviesForGenericTypeCell() {
+        if moviesViewModel.shouldShowMoviesForGenericTypeCell {
             currentDataRow = firstRange.contains(indexPath.row)
             ? indexPath.row - 1
             : indexPath.row - filteredMovies.count - 1
@@ -175,7 +175,7 @@ extension MovieDashboardViewController: UITableViewDataSource {
 
     private func getCellForMovieThumbnail(for indexPath: IndexPath) -> MovieThumbnailCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: Self.movieThumbnailCellID, for: indexPath) as! MovieThumbnailCell
-        let movieThumbnail: MovieThumbnail = moviesViewModel.getShouldShowMoviesForSearchText()
+        let movieThumbnail: MovieThumbnail = moviesViewModel.shouldShowMoviesForSearchText
         ? moviesViewModel.getMovieThumbnailsForSearchedMovies()[indexPath.row]
         : movieThumbnailsViewModel.movieThumbnailForRow(at: indexPath)
         cell.configure(movieThumbnail: movieThumbnail)

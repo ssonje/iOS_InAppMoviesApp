@@ -11,7 +11,7 @@ extension MovieDashboardViewController: UITableViewDelegate {
     }
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if moviesViewModel.getShouldShowMoviesForSearchText() {
+        if moviesViewModel.shouldShowMoviesForSearchText {
             let movieDetailsViewController = MovieDetailsViewController(
                 movie: moviesViewModel.getSearchedMovies()[indexPath.row],
                 movieThumbnailsViewModel: movieThumbnailsViewModel)
@@ -33,14 +33,8 @@ extension MovieDashboardViewController: UITableViewDelegate {
                         movieCategoryViewModel.updateMovieCategory(at: indexPath.section, with: movieCategory)
                     }
                 } else {
-                    if moviesViewModel.getShouldShowMoviesForGenericTypeCell() {
-                        let movieCategory = movieCategoryViewModel.movieCategoriesForRow(at: indexPath.section)
-                        let filteredMovies = moviesViewModel.getMovieThumbnailsForFilteredMovies()
-                        let firstRange = 0...moviesViewModel.getSelectedRow()
-                        if movieCategory.open
-                            && moviesViewModel.getShouldShowMoviesForGenericTypeCell()
-                            && !firstRange.contains(indexPath.row)
-                            && indexPath.row - moviesViewModel.getSelectedRow() - 1 < filteredMovies.count {
+                    if moviesViewModel.shouldShowMoviesForGenericTypeCell {
+                        if shouldShowMoviesForGenericTypeCell(for: indexPath) {
                             switch indexPath.section {
                             case 0, 1, 2, 3:
                                 let movieDetailsViewController = MovieDetailsViewController(
@@ -81,7 +75,7 @@ extension MovieDashboardViewController: UITableViewDelegate {
                     movieCategory.open = false
                     movieCategoryViewModel.updateMovieCategory(at: index, with: movieCategory)
 
-                    if moviesViewModel.getShouldShowMoviesForGenericTypeCell() {
+                    if moviesViewModel.shouldShowMoviesForGenericTypeCell {
                         moviesViewModel.toggleShouldShowMoviesForGenericTypeCell()
                     }
                 }
@@ -94,31 +88,11 @@ extension MovieDashboardViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         switch indexPath.section {
         case 0, 1, 2, 3:
-            let movieCategory = movieCategoryViewModel.movieCategoriesForRow(at: indexPath.section)
-            let filteredMovies = moviesViewModel.getMovieThumbnailsForFilteredMovies()
-            let firstRange = 0...moviesViewModel.getSelectedRow()
-            if movieCategory.open
-                && moviesViewModel.getShouldShowMoviesForGenericTypeCell()
-                && !firstRange.contains(indexPath.row)
-                && indexPath.row - moviesViewModel.getSelectedRow() - 1 < filteredMovies.count {
-                let currentMovieThumbnailRow = indexPath.row - moviesViewModel.getSelectedRow() - 1
-                let currentMovie = moviesViewModel.getFilteredMovies()[currentMovieThumbnailRow]
-                movieThumbnailsViewModel.movieThumbnailImage(for: currentMovie.poster) { image in
-                    DispatchQueue.main.async {
-                        if let cell = tableView.cellForRow(at: indexPath) as? MovieThumbnailCell {
-                            cell.updateThumbnailImage(image: image)
-                        }
-                    }
-                }
+            if shouldShowMoviesForGenericTypeCell(for: indexPath) {
+                fetchMovieThubnailForCategoriesOtherThanAllMovies(tableView, at: indexPath)
             }
         case 4:
-            movieThumbnailsViewModel.movieThumbnailImage(at: indexPath) { image in
-                DispatchQueue.main.async {
-                    if let cell = tableView.cellForRow(at: indexPath) as? MovieThumbnailCell {
-                        cell.updateThumbnailImage(image: image)
-                    }
-                }
-            }
+            fetchMovieThubnailForAllMovies(tableView, at: indexPath)
         default:
             break
         }
@@ -126,9 +100,41 @@ extension MovieDashboardViewController: UITableViewDelegate {
 
     // MARK: - Private Helpers
 
+    private func shouldShowMoviesForGenericTypeCell(for indexPath: IndexPath) -> Bool {
+        let movieCategory = movieCategoryViewModel.movieCategoriesForRow(at: indexPath.section)
+        let filteredMovieThumbnails = moviesViewModel.getMovieThumbnailsForFilteredMovies()
+        let firstRange = 0...moviesViewModel.getSelectedRow()
+        return movieCategory.open
+            && moviesViewModel.shouldShowMoviesForGenericTypeCell
+            && !firstRange.contains(indexPath.row)
+            && indexPath.row - moviesViewModel.getSelectedRow() - 1 < filteredMovieThumbnails.count
+    }
+
     private func getMoviesAfterTappingOnTheGenericCell(searchText: String, indexPath: IndexPath) {
         moviesViewModel.fetchMoviesAfterTappingOnGenricTypeCell(searchText: searchText, section: indexPath.section)
         moviesViewModel.toggleShouldShowMoviesForGenericTypeCell()
         moviesViewModel.updateCurrentSelectedRow(at: indexPath)
+    }
+
+    private func fetchMovieThubnailForCategoriesOtherThanAllMovies(_ tableView: UITableView, at indexPath: IndexPath) {
+        let currentMovieThumbnailRow = indexPath.row - moviesViewModel.getSelectedRow() - 1
+        let currentMovie = moviesViewModel.getFilteredMovies()[currentMovieThumbnailRow]
+        movieThumbnailsViewModel.movieThumbnailImage(for: currentMovie.poster) { image in
+            DispatchQueue.main.async {
+                if let cell = tableView.cellForRow(at: indexPath) as? MovieThumbnailCell {
+                    cell.updateThumbnailImage(image: image)
+                }
+            }
+        }
+    }
+
+    private func fetchMovieThubnailForAllMovies(_ tableView: UITableView, at indexPath: IndexPath) {
+        movieThumbnailsViewModel.movieThumbnailImage(at: indexPath) { image in
+            DispatchQueue.main.async {
+                if let cell = tableView.cellForRow(at: indexPath) as? MovieThumbnailCell {
+                    cell.updateThumbnailImage(image: image)
+                }
+            }
+        }
     }
 }
