@@ -1,3 +1,4 @@
+
 import Foundation
 import UIKit
 
@@ -39,11 +40,11 @@ extension MovieDashboardViewController: UITableViewDelegate {
                         if movieCategory.open
                             && moviesViewModel.getShouldShowMoviesForGenericTypeCell()
                             && !firstRange.contains(indexPath.row)
-                            && indexPath.row <= indexPath.section + filteredMovies.count + moviesViewModel.getSelectedRow() {
+                            && indexPath.row - moviesViewModel.getSelectedRow() - 1 < filteredMovies.count {
                             switch indexPath.section {
                             case 0, 1, 2, 3:
                                 let movieDetailsViewController = MovieDetailsViewController(
-                                    movie: moviesViewModel.getFilteredMovies()[indexPath.row - indexPath.section - moviesViewModel.getSelectedRow() - 1],
+                                    movie: moviesViewModel.getFilteredMovies()[indexPath.row - moviesViewModel.getSelectedRow() - 1],
                                     movieThumbnailsViewModel: movieThumbnailsViewModel)
                                 navigationController?.pushViewController(movieDetailsViewController, animated: true)
                             default:
@@ -99,8 +100,8 @@ extension MovieDashboardViewController: UITableViewDelegate {
             if movieCategory.open
                 && moviesViewModel.getShouldShowMoviesForGenericTypeCell()
                 && !firstRange.contains(indexPath.row)
-                && indexPath.row <= indexPath.section + filteredMovies.count + moviesViewModel.getSelectedRow() {
-                let currentMovieThumbnailRow = indexPath.row - indexPath.section - moviesViewModel.getSelectedRow() - 1
+                && indexPath.row - moviesViewModel.getSelectedRow() - 1 < filteredMovies.count {
+                let currentMovieThumbnailRow = indexPath.row - moviesViewModel.getSelectedRow() - 1
                 let currentMovie = moviesViewModel.getFilteredMovies()[currentMovieThumbnailRow]
                 movieThumbnailsViewModel.movieThumbnailImage(for: currentMovie.poster) { image in
                     DispatchQueue.main.async {
