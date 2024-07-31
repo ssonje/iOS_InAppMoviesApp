@@ -24,14 +24,7 @@ extension MovieDashboardViewController: UITableViewDelegate {
         for index in 0..<movieCategories {
             if indexPath.section == index {
                 if indexPath.row == 0 {
-                    var movieCategory = movieCategoryViewModel.movieCategoriesForRow(at: indexPath.section)
-                    if movieCategory.open {
-                        movieCategory.open = false
-                        movieCategoryViewModel.updateMovieCategory(at: indexPath.section, with: movieCategory)
-                    } else {
-                        movieCategory.open = true
-                        movieCategoryViewModel.updateMovieCategory(at: indexPath.section, with: movieCategory)
-                    }
+                    updateMovieCategoryWhenTapOnIt(at: indexPath)
                 } else {
                     if moviesViewModel.shouldShowMoviesForGenericTypeCell {
                         if shouldShowMoviesForGenericTypeCell(for: indexPath) {
@@ -50,37 +43,25 @@ extension MovieDashboardViewController: UITableViewDelegate {
                     } else {
                         switch indexPath.section {
                         case 0:
-                            let searchText = moviesViewModel.getUniqueYears()[indexPath.row - 1]
-                            getMoviesAfterTappingOnTheGenericCell(searchText: searchText, indexPath: indexPath)
+                            didSelectYearsSectionCell(at: indexPath)
                         case 1:
-                            let searchText = moviesViewModel.getUniqueGenres()[indexPath.row - 1]
-                            getMoviesAfterTappingOnTheGenericCell(searchText: searchText, indexPath: indexPath)
+                            didSelectGenresSectionCell(at: indexPath)
                         case 2:
-                            let searchText = moviesViewModel.getUniqueDirectors()[indexPath.row - 1]
-                            getMoviesAfterTappingOnTheGenericCell(searchText: searchText, indexPath: indexPath)
+                            didSelectDirectorsSectionCell(at: indexPath)
                         case 3:
-                            let searchText = moviesViewModel.getUniqueActors()[indexPath.row - 1]
-                            getMoviesAfterTappingOnTheGenericCell(searchText: searchText, indexPath: indexPath)
+                            didSelectActorsSectionCell(at: indexPath)
                         default:
-                            let movieDetailsViewController = MovieDetailsViewController(
-                                movie: moviesViewModel.movieForRow(at: indexPath),
-                                movieThumbnailsViewModel: movieThumbnailsViewModel)
-                            navigationController?.pushViewController(movieDetailsViewController, animated: true)
+                            didSelectAllmoviesSectionCell(at: indexPath)
                         }
                     }
                 }
             } else {
-                var movieCategory = movieCategoryViewModel.movieCategoriesForRow(at: index)
-                if movieCategory.open {
-                    movieCategory.open = false
-                    movieCategoryViewModel.updateMovieCategory(at: index, with: movieCategory)
-
-                    if moviesViewModel.shouldShowMoviesForGenericTypeCell {
-                        moviesViewModel.toggleShouldShowMoviesForGenericTypeCell()
-                    }
-                }
+                updateMovieCategoryWhenTapOnOtherCategoryOrItsCells(at: index)
             }
         }
+
+        // Update required sections
+        // TODO: We can optimise this by updating the section on which the user is tapping on
         let sections = IndexSet.init(integersIn: 0..<movieCategories)
         tableView.reloadSections(sections, with: .none)
     }
@@ -135,6 +116,56 @@ extension MovieDashboardViewController: UITableViewDelegate {
                     cell.updateThumbnailImage(image: image)
                 }
             }
+        }
+    }
+
+    private func didSelectYearsSectionCell(at indexPath: IndexPath) {
+        let searchText = moviesViewModel.getUniqueYears()[indexPath.row - 1]
+        getMoviesAfterTappingOnTheGenericCell(searchText: searchText, indexPath: indexPath)
+    }
+
+    private func didSelectGenresSectionCell(at indexPath: IndexPath) {
+        let searchText = moviesViewModel.getUniqueGenres()[indexPath.row - 1]
+        getMoviesAfterTappingOnTheGenericCell(searchText: searchText, indexPath: indexPath)
+    }
+
+    private func didSelectDirectorsSectionCell(at indexPath: IndexPath) {
+        let searchText = moviesViewModel.getUniqueDirectors()[indexPath.row - 1]
+        getMoviesAfterTappingOnTheGenericCell(searchText: searchText, indexPath: indexPath)
+    }
+
+    private func didSelectActorsSectionCell(at indexPath: IndexPath) {
+        let searchText = moviesViewModel.getUniqueActors()[indexPath.row - 1]
+        getMoviesAfterTappingOnTheGenericCell(searchText: searchText, indexPath: indexPath)
+    }
+
+    private func didSelectAllmoviesSectionCell(at indexPath: IndexPath) {
+        let movieDetailsViewController = MovieDetailsViewController(
+            movie: moviesViewModel.movieForRow(at: indexPath),
+            movieThumbnailsViewModel: movieThumbnailsViewModel)
+        navigationController?.pushViewController(movieDetailsViewController, animated: true)
+    }
+
+    private func updateMovieCategoryWhenTapOnOtherCategoryOrItsCells(at index: Int) {
+        var movieCategory = movieCategoryViewModel.movieCategoriesForRow(at: index)
+        if movieCategory.open {
+            movieCategory.open = false
+            movieCategoryViewModel.updateMovieCategory(at: index, with: movieCategory)
+
+            if moviesViewModel.shouldShowMoviesForGenericTypeCell {
+                moviesViewModel.toggleShouldShowMoviesForGenericTypeCell()
+            }
+        }
+    }
+
+    private func updateMovieCategoryWhenTapOnIt(at indexPath: IndexPath) {
+        var movieCategory = movieCategoryViewModel.movieCategoriesForRow(at: indexPath.section)
+        if movieCategory.open {
+            movieCategory.open = false
+            movieCategoryViewModel.updateMovieCategory(at: indexPath.section, with: movieCategory)
+        } else {
+            movieCategory.open = true
+            movieCategoryViewModel.updateMovieCategory(at: indexPath.section, with: movieCategory)
         }
     }
 }

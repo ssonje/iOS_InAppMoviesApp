@@ -34,30 +34,30 @@ extension MovieDashboardViewController: UITableViewDataSource {
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if indexPath.row == 0 && !moviesViewModel.shouldShowMoviesForSearchText {
-            return getMovieCategoryCell(for: indexPath)
+            return getMovieCategoryCell(at: indexPath)
         } else {
-            if shouldShowMoviesForGenericTypeCell(for: indexPath) {
+            if shouldShowMoviesForGenericTypeCell(at: indexPath) {
                 switch indexPath.section {
                 case 0, 1, 2, 3:
                     let currentDataRow = indexPath.row - moviesViewModel.getSelectedRow() - 1
                     let filteredMovieThumbnails = moviesViewModel.getMovieThumbnailsForFilteredMovies()
-                    return getCellForMovieThumbnail(for: indexPath, at: currentDataRow, filteredMovieThumbnails: filteredMovieThumbnails)
+                    return getCellForMovieThumbnail(at: indexPath, with: currentDataRow, filteredMovieThumbnails: filteredMovieThumbnails)
                 default:
                     return UITableViewCell()
                 }
             } else {
-                let currentDataRow: Int = getCurrentDataRow(indexPath: indexPath)
+                let currentDataRow: Int = getCurrentDataRow(at: indexPath)
                 switch indexPath.section {
                 case 0:
-                    return getCellForUniqueYears(for: indexPath, at: currentDataRow)
+                    return getCellForUniqueYears(at: indexPath, with: currentDataRow)
                 case 1:
-                    return getCellForUniqueGenres(for: indexPath, at: currentDataRow)
+                    return getCellForUniqueGenres(at: indexPath, with: currentDataRow)
                 case 2:
-                    return getCellForUniqueDirectors(for: indexPath, at: currentDataRow)
+                    return getCellForUniqueDirectors(at: indexPath, with: currentDataRow)
                 case 3:
-                    return getCellForUniqueActors(for: indexPath, at: currentDataRow)
+                    return getCellForUniqueActors(at: indexPath, with: currentDataRow)
                 case 4:
-                    return getCellForMovieThumbnail(for: indexPath)
+                    return getCellForMovieThumbnail(at: indexPath)
                 default:
                     return UITableViewCell()
                 }
@@ -125,7 +125,7 @@ extension MovieDashboardViewController: UITableViewDataSource {
 
     // MARK: - Private Helpers for cellForRowAt
 
-    private func shouldShowMoviesForGenericTypeCell(for indexPath: IndexPath) -> Bool {
+    private func shouldShowMoviesForGenericTypeCell(at indexPath: IndexPath) -> Bool {
         let movieCategory = movieCategoryViewModel.movieCategoriesForRow(at: indexPath.section)
         let filteredMovieThumbnails = moviesViewModel.getMovieThumbnailsForFilteredMovies()
         let firstRange = 0...moviesViewModel.getSelectedRow()
@@ -135,7 +135,7 @@ extension MovieDashboardViewController: UITableViewDataSource {
             && indexPath.row - moviesViewModel.getSelectedRow() - 1 < filteredMovieThumbnails.count
     }
 
-    private func getCurrentDataRow(indexPath: IndexPath) -> Int {
+    private func getCurrentDataRow(at indexPath: IndexPath) -> Int {
         let filteredMovies = moviesViewModel.getMovieThumbnailsForFilteredMovies()
         let firstRange = 0...moviesViewModel.getSelectedRow()
         let currentDataRow: Int
@@ -149,31 +149,31 @@ extension MovieDashboardViewController: UITableViewDataSource {
         return currentDataRow
     }
 
-    private func getCellForUniqueYears(for indexPath: IndexPath, at currentDataRow: Int) -> MovieGenericTypeCell {
+    private func getCellForUniqueYears(at indexPath: IndexPath, with currentDataRow: Int) -> MovieGenericTypeCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: Self.movieGenericTypeCellID_Years, for: indexPath) as! MovieGenericTypeCell
         cell.configure(data: moviesViewModel.getUniqueYears()[currentDataRow])
         return cell
     }
 
-    private func getCellForUniqueGenres(for indexPath: IndexPath, at currentDataRow: Int) -> MovieGenericTypeCell {
+    private func getCellForUniqueGenres(at indexPath: IndexPath, with currentDataRow: Int) -> MovieGenericTypeCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: Self.movieGenericTypeCellID_Genres, for: indexPath) as! MovieGenericTypeCell
         cell.configure(data: moviesViewModel.getUniqueGenres()[currentDataRow])
         return cell
     }
 
-    private func getCellForUniqueDirectors(for indexPath: IndexPath, at currentDataRow: Int) -> MovieGenericTypeCell {
+    private func getCellForUniqueDirectors(at indexPath: IndexPath, with currentDataRow: Int) -> MovieGenericTypeCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: Self.movieGenericTypeCellID_Directors, for: indexPath) as! MovieGenericTypeCell
         cell.configure(data: moviesViewModel.getUniqueDirectors()[currentDataRow])
         return cell
     }
 
-    private func getCellForUniqueActors(for indexPath: IndexPath, at currentDataRow: Int) -> MovieGenericTypeCell {
+    private func getCellForUniqueActors(at indexPath: IndexPath, with currentDataRow: Int) -> MovieGenericTypeCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: Self.movieGenericTypeCellID_Actors, for: indexPath) as! MovieGenericTypeCell
         cell.configure(data: moviesViewModel.getUniqueActors()[currentDataRow])
         return cell
     }
 
-    private func getCellForMovieThumbnail(for indexPath: IndexPath) -> MovieThumbnailCell {
+    private func getCellForMovieThumbnail(at indexPath: IndexPath) -> MovieThumbnailCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: Self.movieThumbnailCellID, for: indexPath) as! MovieThumbnailCell
         let movieThumbnail: MovieThumbnail = moviesViewModel.shouldShowMoviesForSearchText
         ? moviesViewModel.getMovieThumbnailsForSearchedMovies()[indexPath.row]
@@ -182,14 +182,14 @@ extension MovieDashboardViewController: UITableViewDataSource {
         return cell
     }
 
-    private func getCellForMovieThumbnail(for indexPath: IndexPath, at currentDataRow: Int, filteredMovieThumbnails: [MovieThumbnail]) -> MovieThumbnailCell {
+    private func getCellForMovieThumbnail(at indexPath: IndexPath, with currentDataRow: Int, filteredMovieThumbnails: [MovieThumbnail]) -> MovieThumbnailCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: Self.movieThumbnailCellID, for: indexPath) as! MovieThumbnailCell
         let movieThumbnail = filteredMovieThumbnails[currentDataRow]
         cell.configure(movieThumbnail: movieThumbnail)
         return cell
     }
 
-    private func getMovieCategoryCell(for indexPath: IndexPath) -> MovieCategoryCell {
+    private func getMovieCategoryCell(at indexPath: IndexPath) -> MovieCategoryCell {
         let movieCategory = movieCategoryViewModel.movieCategoriesForRow(at: indexPath.section)
         let cell = tableView.dequeueReusableCell(withIdentifier: Self.movieCategoryCellID, for: indexPath) as! MovieCategoryCell
         cell.configure(movieCategory: movieCategory)
